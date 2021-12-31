@@ -1,0 +1,59 @@
+.padding1px {
+  padding-top: 1px;
+}
+
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.listItem {
+  margin: 0 0 1.25rem;
+}
+
+.lightText {
+  color: #666;
+}
+
+.content {
+  height: 50px;
+}
+
+.footer {
+  padding-top: 11px;
+  border-top: 1px solid #e5e5e5;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.customBody {
+  color: var(--adm-color-success);
+}
+
+.logo {
+  border-radius: 99%;
+}
+.Layer_1 {
+  width: 18px;
+  height: 18px;
+}
+.navBar {
+  background-color: #8560a9;
+}
+.cat {
+  background-color: #d5ef7f;
+}
+.omit {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  word-break: break-all;
+  height: 100px;
+  -webkit-box-orient: vertical;
+}
+
+.adm-tab-bar-item {
+  width: 10px;
+}
