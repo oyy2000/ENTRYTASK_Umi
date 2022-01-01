@@ -1,42 +1,91 @@
-import { useEffect, useState } from 'react';
-import styles from './index.less';
-import { BASE_URL, _fetch } from '../utils/consts.js';
-import { history } from 'umi';
+import { useEffect, useState } from 'react'
+import styles from './index.less'
+import { BASE_URL, _fetch } from '../utils/consts.js'
+import { history } from 'umi'
+import MyTab from '@/components/commmon/Tab'
+import Comments from '@/components/details/comments'
 
-// history 栈里的实体个数
-console.log(history.length);
+import Cookies from 'js-cookie'
 
-// 当前 history 跳转的 action，有 PUSH、REPLACE 和 POP 三种类型
-console.log(history.action);
-
-// location 对象，包含 pathname、search 和 hash
-console.log(history.location.pathname);
-console.log(history.location.search);
-console.log(history.location.hash);
+import { Avatar, Box, CardContent, List, Divider } from '@mui/material'
+import { Tag } from 'antd-mobile'
 
 export default function Details() {
-  const [event, setEvent] = useState([]);
-  function handleClick() {
-    _fetch(BASE_URL + '/events/1')
-      .then((data) => {
-        console.log(data);
-        setEvent(data.event);
-      })
-      .catch((e) => console.log('错误:', e));
-  }
+  let userInfo = JSON.parse(Cookies.get('USER_INFO'))
+  const [event, setEvent] = useState({})
+  const [comments, setComments] = useState([])
+
   useEffect(() => {
-    handleClick();
-  }, []);
+    async function handleClick() {
+      let id = history.location.query.id || 1
+      let { event } = await _fetch(BASE_URL + '/events/' + id)
+      let { comments } = await _fetch(BASE_URL + '/events/' + id + '/comments')
+      setComments(comments)
+      setEvent(event)
+    }
+    handleClick()
+  }, [])
+  const [value, setValue] = useState('1')
+
+  const handleChange = (event, newValue) => {
+    setValue(newValue)
+  }
 
   return (
     <div>
-      <h1 className={styles.title}>Login index</h1>
-      <input
-        type="button"
-        value="点击 http-get 方式获取数据"
-        onClickCapture={handleClick}
-      />
-      <ul>{event.name}</ul>
+      {event.channel ? (
+        <>
+          <MyTab userInfo={userInfo} type="details" />
+          <div style={{ height: '56px' }} />
+          <Box>
+            <CardContent>
+              <Tag round color="#8560A9" fill="outline">
+                {event.channel.name}
+              </Tag>
+              <div
+                style={{
+                  fontSize: '1.7rem',
+                  fontFamily: 'SourceSansPro-Semibold'
+                }}
+                className="title"
+              >
+                {event.name}
+              </div>
+              <Box sx={{ padding: '10px' }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    flex: '45 0 40px',
+                    flexDirection: 'row',
+                    color: '#67616D',
+                    fontFamily: 'SourceSansPro-Regular',
+                    fontSize: '1.2rem',
+                    alignItems: 'center'
+                  }}
+                >
+                  <Avatar
+                    alt="Remy Sharp"
+                    src={event.creator.avatar}
+                    sx={{ width: 36, height: 36 }}
+                  ></Avatar>
+
+                  <div style={{ paddingLeft: '10px' }}>
+                    {event.creator.username} <br />
+                    <p style={{ fontSize: '0.8rem', color: '#BABABA,' }}>
+                      {event.create_time}
+                    </p>
+                  </div>
+                </div>
+              </Box>
+              <Divider></Divider>
+              <Comments comments={comments} />
+            </CardContent>
+          </Box>
+          <ul></ul>
+        </>
+      ) : (
+        'loading'
+      )}
     </div>
-  );
+  )
 }

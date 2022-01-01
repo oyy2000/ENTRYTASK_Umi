@@ -1,52 +1,51 @@
-import PlayGround from '../components/playground';
-import Tab from '../components/Tab';
-import { BASE_URL, _fetch } from '../utils/consts.js';
-import Cookies from 'js-cookie';
-import Divider from '@mui/material/Divider';
+import PlayGround from '../components/index/playground'
+import Tab from '../components/commmon/Tab'
+import { BASE_URL, _fetch } from '../utils/consts.js'
+import Cookies from 'js-cookie'
+import Divider from '@mui/material/Divider'
 import {
   Drawer,
   Box,
-  Button,
   List,
   ListItem,
   ListItemButton,
   ListItemIcon,
-  ListItemText,
-} from '@mui/material';
-import InboxIcon from '@mui/icons-material/Inbox';
-import DraftsIcon from '@mui/icons-material/Drafts';
-import { useState } from 'react';
-import React from 'react';
-type Anchor = 'top' | 'left' | 'bottom' | 'right';
+  ListItemText
+} from '@mui/material'
+import InboxIcon from '@mui/icons-material/Inbox'
+import DraftsIcon from '@mui/icons-material/Drafts'
+import { useState } from 'react'
+import React from 'react'
+type Anchor = 'top' | 'left' | 'bottom' | 'right'
 export default function index() {
-  let userInfo = JSON.parse(Cookies.get('USER_INFO'));
+  let userInfo = JSON.parse(Cookies.get('USER_INFO'))
   const [state, setState] = React.useState({
     top: false,
     left: false,
     bottom: false,
-    right: false,
-  });
+    right: false
+  })
   const toggleDrawer =
     (anchor: Anchor, open: boolean) =>
     (event: React.KeyboardEvent | React.MouseEvent) => {
-      console.log(anchor);
+      console.log(anchor)
       if (
         event.type === 'keydown' &&
         ((event as React.KeyboardEvent).key === 'Tab' ||
           (event as React.KeyboardEvent).key === 'Shift')
       ) {
-        return;
+        return
       }
 
-      setState({ ...state, [anchor]: open });
-    };
+      setState({ ...state, [anchor]: open })
+    }
 
   const list = (anchor: Anchor) => (
     <Box
       sx={{
         width: anchor === 'top' || anchor === 'bottom' ? 'auto' : 250,
         height: '100%',
-        bgcolor: '#453257',
+        bgcolor: '#453257'
       }}
       role="presentation"
       // onClick={toggleDrawer(anchor, false)}
@@ -88,7 +87,7 @@ export default function index() {
         </List>
       </nav>
     </Box>
-  );
+  )
   return (
     <>
       <div>
@@ -113,5 +112,5 @@ export default function index() {
         </div>
       </div>
     </>
-  );
+  )
 }

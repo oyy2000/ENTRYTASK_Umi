@@ -5,11 +5,11 @@ export default function Img({ src, width, height }) {
       style={{
         width,
         height,
-        borderRadius: '99%',
+        borderRadius: '99%'
       }}
       src={src}
     ></img>
-  );
+  )
 }
 // export default function ImgWrapper({ Component }) {
 //   return (
