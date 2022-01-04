@@ -18,7 +18,7 @@ import {
 import React, { useState, useEffect } from 'react'
 
 type Anchor = 'top' | 'left' | 'bottom' | 'right'
-export default function index(search) {
+export default function index({ Search }) {
   const [channels, setChannels] = useState([])
   const [state, setState] = useState({
     top: false,
@@ -26,19 +26,20 @@ export default function index(search) {
     bottom: false,
     right: false
   })
+
   // getChannels
   let channelChecked = {}
+  channels.forEach((channel) => {
+    channelChecked[channel.name] = false
+  })
   useEffect(() => {
     const getChannels = async () => {
       let { channels } = await _fetch(BASE_URL + '/channels')
       setChannels(channels)
-      channels.forEach((channel) => {
-        channelChecked[channel.name] = false
-      })
     }
     getChannels()
   }, [])
-
+  // 展开抽屉 是个闭包函数
   const toggleDrawer =
     (anchor: Anchor, open: boolean) =>
     (event: React.KeyboardEvent | React.MouseEvent) => {
@@ -53,23 +54,23 @@ export default function index(search) {
     }
   // const [beforeTimes, setBeforeTimes] = useState();
   // const [afterTimes, setAfterTimes] = useState();
+  //管理被选中的Date和Channels状态
   const [chosenDate, setChosenDate] = useState('ANYTIME')
-
   const [chosenChannels, setChosenChannels] = useState(channelChecked)
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  // 点击操作
+  const handleChangeDate = (event: React.ChangeEvent<HTMLInputElement>) => {
     setChosenDate((event.target as HTMLInputElement).value)
   }
 
-  const handleChange2 = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChangeChannels = (event: React.ChangeEvent<HTMLInputElement>) => {
     setChosenChannels({
       ...chosenChannels,
       [event.target.name]: event.target.checked
     })
   }
 
-  const [posts, setPosts] = useState([])
-  const Search = async (options) => {
-    // console.log(chosenChannels);
+  // 搜索按钮点击后
+  const ClickSearch = async (data) => {
     let before = dayjs().add(9, 'year').endOf('day').valueOf()
     let after = dayjs().subtract(9, 'year').startOf('day').valueOf()
     if (chosenDate === 'ANYTIME') {
@@ -84,30 +85,28 @@ export default function index(search) {
         channels.push(index + 1)
       }
     })
-    options = {
-      ...options,
+    data = {
+      ...data,
       ...{ channels, before, after }
     }
-    const { events, hasMore } = await _fetch(BASE_URL + '/events', options)
-    setPosts((post) => [...post, ...events])
+    Search(data)
+    // 重置选项
     // setChosenChannels(channelChecked);
     // setChosenDate('ANYTIME');
   }
-  console.log(posts)
   const list = (anchor: Anchor) => (
     <ThemeProvider theme={theme}>
       <Box
         sx={{
           width: anchor === 'top' || anchor === 'bottom' ? 'auto' : 270,
-          height: '800px',
           bgcolor: '#453257',
           color: 'white',
           textAlign: 'center'
         }}
         role="presentation"
-        // onClick={toggleDrawer(anchor, false)}
         onKeyDown={toggleDrawer(anchor, false)}
       >
+        {/* 单选date */}
         <nav aria-label="date">
           <Box sx={{ padding: '20px' }}>
             <FormControl component="fieldset">
@@ -123,7 +122,7 @@ export default function index(search) {
                 aria-label="date"
                 name="controlled-radio-buttons-group"
                 value={chosenDate}
-                onChange={handleChange}
+                onChange={handleChangeDate}
               >
                 <FormControlLabel
                   value="ANYTIME"
@@ -145,6 +144,7 @@ export default function index(search) {
           </Box>
         </nav>
         <Divider />
+        {/* 多选channels*/}
         <nav aria-label="secondary mailbox folders">
           <Box sx={{ padding: '20px' }}>
             <FormControl component="fieldset">
@@ -164,7 +164,7 @@ export default function index(search) {
                       control={
                         <Checkbox
                           checked={chosenChannels[channel.name]}
-                          onChange={handleChange2}
+                          onChange={handleChangeChannels}
                           name={channel.name}
                           color="bright"
                           key={channel.id}
@@ -179,7 +179,7 @@ export default function index(search) {
         </nav>
         <Paper
           sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }}
-          onClick={() => Search()}
+          onClick={() => ClickSearch()}
         >
           <Button>search</Button>
         </Paper>
@@ -195,7 +195,6 @@ export default function index(search) {
               <Box>{list(anchor)}</Box>
             </React.Fragment>
           ))}
-          {console.log(channels)}
         </div>
       </div>
     </>
