@@ -6,7 +6,6 @@ import Typography from '@mui/material/Typography'
 import { Avatar, ListItemAvatar, List, CardContent } from '@mui/material'
 
 export default function comment({ comments }) {
-  console.log(comments)
   return (
     <>
       {comments[0].user ? (

@@ -1,4 +1,4 @@
-import { defineConfig } from 'umi';
+import { defineConfig } from 'umi'
 
 export default defineConfig({
   routes: [
@@ -7,6 +7,7 @@ export default defineConfig({
     { path: '/login', component: '@/pages/login' },
     { path: '/details', component: '@/pages/details' },
     { path: '/search', component: '@/pages/search' },
+    { path: '/me', component: '@/pages/me' }
   ],
-  mfsu: {},
-});
+  mfsu: {}
+})

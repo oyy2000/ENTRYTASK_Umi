@@ -36,7 +36,6 @@ export default function Details() {
       {event.channel ? (
         <>
           <MyTab userInfo={userInfo} type="details" />
-          <div style={{ height: '56px' }} />
           <Box>
             <CardContent>
               <Tag round color="#8560A9" fill="outline">

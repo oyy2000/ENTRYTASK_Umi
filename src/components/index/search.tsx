@@ -1,6 +1,8 @@
-import { BASE_URL, _fetch } from '../utils/consts.js'
+import { BASE_URL, _fetch } from '../../utils/consts.js'
 import Divider from '@mui/material/Divider'
-import { theme } from '../styles/palette.js'
+import { theme } from '../../styles/palette.js'
+import { HomeIcon, LogoIcon, SearchIcon } from '../SVGs/Icons.js'
+
 import dayjs from 'dayjs'
 import {
   Box,
@@ -15,10 +17,11 @@ import {
   Checkbox,
   FormGroup
 } from '@mui/material'
+
 import React, { useState, useEffect } from 'react'
 
 type Anchor = 'top' | 'left' | 'bottom' | 'right'
-export default function index(search) {
+export default function index({ Search }) {
   const [channels, setChannels] = useState([])
   const [state, setState] = useState({
     top: false,
@@ -39,20 +42,6 @@ export default function index(search) {
     getChannels()
   }, [])
 
-  const toggleDrawer =
-    (anchor: Anchor, open: boolean) =>
-    (event: React.KeyboardEvent | React.MouseEvent) => {
-      if (
-        event.type === 'keydown' &&
-        ((event as React.KeyboardEvent).key === 'Tab' ||
-          (event as React.KeyboardEvent).key === 'Shift')
-      ) {
-        return
-      }
-      setState({ ...state, [anchor]: open })
-    }
-  // const [beforeTimes, setBeforeTimes] = useState();
-  // const [afterTimes, setAfterTimes] = useState();
   const [chosenDate, setChosenDate] = useState('ANYTIME')
 
   const [chosenChannels, setChosenChannels] = useState(channelChecked)
@@ -68,16 +57,14 @@ export default function index(search) {
   }
 
   const [posts, setPosts] = useState([])
-  const Search = async (options) => {
-    // console.log(chosenChannels);
+  const ClickSearch = async (options) => {
     let before = dayjs().add(9, 'year').endOf('day').valueOf()
     let after = dayjs().subtract(9, 'year').startOf('day').valueOf()
     if (chosenDate === 'ANYTIME') {
     } else if (chosenDate === 'TODAY') {
-      before = dayjs().endOf('day')
-      after = dayjs().startOf('day')
+      before = dayjs().endOf('day').valueOf()
+      after = dayjs().startOf('day').valueOf()
     }
-
     let channels = []
     Object.values(chosenChannels).map((v, index) => {
       if (v) {
@@ -88,25 +75,23 @@ export default function index(search) {
       ...options,
       ...{ channels, before, after }
     }
-    const { events, hasMore } = await _fetch(BASE_URL + '/events', options)
-    setPosts((post) => [...post, ...events])
-    // setChosenChannels(channelChecked);
-    // setChosenDate('ANYTIME');
+    Search(options)
+    //重置
+    setChosenChannels(channelChecked)
+    setChosenDate('ANYTIME')
+    // 关闭自己
   }
-  console.log(posts)
   const list = (anchor: Anchor) => (
     <ThemeProvider theme={theme}>
       <Box
         sx={{
           width: anchor === 'top' || anchor === 'bottom' ? 'auto' : 270,
-          height: '800px',
+          height: '100vh',
           bgcolor: '#453257',
           color: 'white',
           textAlign: 'center'
         }}
         role="presentation"
-        // onClick={toggleDrawer(anchor, false)}
-        onKeyDown={toggleDrawer(anchor, false)}
       >
         <nav aria-label="date">
           <Box sx={{ padding: '20px' }}>
@@ -137,7 +122,7 @@ export default function index(search) {
                 />
                 <FormControlLabel
                   value="TOMORROW"
-                  control={<Radio />}
+                  control={<Radio color="bright" />}
                   label="TOMORROW"
                 />
               </RadioGroup>
@@ -178,26 +163,31 @@ export default function index(search) {
           </Box>
         </nav>
         <Paper
-          sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }}
-          onClick={() => Search()}
+          sx={{
+            position: 'fixed',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            width: '270px'
+          }}
+          onClick={() => ClickSearch()}
         >
-          <Button>search</Button>
+          <Button
+            variant="contained"
+            fullWidth
+            color="bright"
+            startIcon={<SearchIcon></SearchIcon>}
+            sx={{ height: '60px' }}
+          >
+            SEARCH
+          </Button>
         </Paper>
       </Box>
     </ThemeProvider>
   )
   return (
     <>
-      <div>
-        <div>
-          {(['left'] as const).map((anchor) => (
-            <React.Fragment key={anchor}>
-              <Box>{list(anchor)}</Box>
-            </React.Fragment>
-          ))}
-          {console.log(channels)}
-        </div>
-      </div>
+      <Box>{list('left')}</Box>
     </>
   )
 }

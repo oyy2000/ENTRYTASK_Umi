@@ -2,33 +2,48 @@ import PlayGround from '../components/index/playground'
 import Tab from '../components/commmon/Tab'
 import { BASE_URL, _fetch } from '../utils/consts.js'
 import Cookies from 'js-cookie'
-import Divider from '@mui/material/Divider'
-import {
-  Drawer,
-  Box,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText
-} from '@mui/material'
-import InboxIcon from '@mui/icons-material/Inbox'
-import DraftsIcon from '@mui/icons-material/Drafts'
-import { useState } from 'react'
-import React from 'react'
+import { Drawer, Box } from '@mui/material'
+import Search from '../components/index/search'
+import React, { useState, useEffect } from 'react'
+import SearchInfo from '../components/index/searchInfo'
+
+const SEARCH_STATE = {
+  NOT_YET: 1,
+  SEARCHED_WITH_ANSWER: 2,
+  SEARCHED_WITHOUT_ANSWER: 3
+}
 type Anchor = 'top' | 'left' | 'bottom' | 'right'
 export default function index() {
+  // 获取用户信息
   let userInfo = JSON.parse(Cookies.get('USER_INFO'))
-  const [state, setState] = React.useState({
+  // 抽屉的方向
+  const [state, setState] = useState({
     top: false,
     left: false,
     bottom: false,
     right: false
   })
+  // 搜索的
+  const [searchState, setSearchState] = useState<number>(SEARCH_STATE.NOT_YET)
+  useEffect(() => {
+    getMorePost()
+  }, [])
+  const [posts, setPosts] = useState<Array<any>>([])
+  const [hasMore, setHasMore] = useState<boolean>(true)
+  const [dateAndChannels, setDateAndChannels] = useState({})
+
+  const getMorePost = async () => {
+    const { events, hasMore } = await _fetch(BASE_URL + '/events', {
+      offset: posts.length,
+      limit: 10
+    })
+    setHasMore(hasMore)
+    setPosts((post) => [...post, ...events])
+  }
+
   const toggleDrawer =
     (anchor: Anchor, open: boolean) =>
     (event: React.KeyboardEvent | React.MouseEvent) => {
-      console.log(anchor)
       if (
         event.type === 'keydown' &&
         ((event as React.KeyboardEvent).key === 'Tab' ||
@@ -36,80 +51,77 @@ export default function index() {
       ) {
         return
       }
-
       setState({ ...state, [anchor]: open })
     }
 
-  const list = (anchor: Anchor) => (
-    <Box
-      sx={{
-        width: anchor === 'top' || anchor === 'bottom' ? 'auto' : 250,
-        height: '100%',
-        bgcolor: '#453257'
-      }}
-      role="presentation"
-      // onClick={toggleDrawer(anchor, false)}
-      onKeyDown={toggleDrawer(anchor, false)}
-    >
-      <nav aria-label="main mailbox folders">
-        <List>
-          <ListItem>
-            <ListItemButton>
-              <ListItemIcon>
-                <InboxIcon />
-              </ListItemIcon>
-              <ListItemText primary="Inbox" />
-            </ListItemButton>
-          </ListItem>
-          <ListItem disablePadding>
-            <ListItemButton>
-              <ListItemIcon>
-                <DraftsIcon />
-              </ListItemIcon>
-              <ListItemText primary="Drafts" />
-            </ListItemButton>
-          </ListItem>
-        </List>
-      </nav>
-      <Divider />
-      <nav aria-label="secondary mailbox folders">
-        <List>
-          <ListItem disablePadding>
-            <ListItemButton>
-              <ListItemText primary="Trash" />
-            </ListItemButton>
-          </ListItem>
-          <ListItem disablePadding>
-            <ListItemButton component="a" href="#simple-list">
-              <ListItemText primary="Spam" />
-            </ListItemButton>
-          </ListItem>
-        </List>
-      </nav>
-    </Box>
-  )
+  async function SearchEvents(data) {
+    setDateAndChannels(data)
+    const { events, hasMore } = await _fetch(BASE_URL + '/events', data)
+    console.log(events)
+    //返回的事件结果存储起来
+    setPosts(events)
+    //关闭drawer
+    setState({ ...state, ['left']: false })
+    if (events.length > 0) setSearchState(SEARCH_STATE.SEARCHED_WITH_ANSWER)
+    else setSearchState(SEARCH_STATE.SEARCHED_WITHOUT_ANSWER)
+  }
+  async function CleanSearch() {
+    setSearchState(SEARCH_STATE.NOT_YET)
+    const { events } = await _fetch(BASE_URL + '/events')
+    setPosts(events)
+  }
+  async function loadMore() {
+    const { events } = await _fetch(BASE_URL + '/events')
+    console.log(events)
+    //返回的事件结果存储起来
+    setPosts(events)
+    //关闭drawer
+    setState({ ...state, ['left']: false })
+    if (events.length > 0) setSearchState(SEARCH_STATE.SEARCHED_WITH_ANSWER)
+    else setSearchState(SEARCH_STATE.SEARCHED_WITHOUT_ANSWER)
+  }
   return (
     <>
-      <div>
-        <Tab
-          userInfo={userInfo}
-          type="index"
-          toggleDrawer={toggleDrawer('left', true)}
+      {/* 菜单栏 */}
+      <Tab
+        userInfo={userInfo}
+        type="index"
+        toggleDrawer={toggleDrawer('left', true)}
+      />
+      {/* 根据搜索情况来展示 */}
+      {searchState == SEARCH_STATE.NOT_YET ? (
+        <></>
+      ) : searchState == SEARCH_STATE.SEARCHED_WITH_ANSWER ? (
+        <SearchInfo
+          CleanSearch={CleanSearch}
+          data={dateAndChannels}
+          length={posts.length}
         />
-        <PlayGround userInfo={userInfo} />
+      ) : (
         <div>
-          {(['left', 'right', 'top', 'bottom'] as const).map((anchor) => (
-            <React.Fragment key={anchor}>
-              <Drawer
-                anchor={anchor}
-                open={state[anchor]}
-                onClose={toggleDrawer(anchor, false)}
-              >
-                {list(anchor)}
-              </Drawer>
-            </React.Fragment>
-          ))}
+          <SearchInfo
+            CleanSearch={CleanSearch}
+            data={dateAndChannels}
+            length={posts.length}
+          />
         </div>
+      )}
+      {/* 无限滚动内容 */}
+      <PlayGround userInfo={userInfo} data={posts} />
+      <div>
+        {/* 抽屉 */}
+        {(['left'] as const).map((anchor) => (
+          <React.Fragment key={anchor}>
+            <Drawer
+              anchor={anchor}
+              open={state[anchor]}
+              onClose={toggleDrawer(anchor, false)}
+              sx={{ height: '100vh' }}
+            >
+              <Search Search={SearchEvents}></Search>
+            </Drawer>
+          </React.Fragment>
+        ))}
       </div>
     </>
   )
