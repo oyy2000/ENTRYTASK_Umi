@@ -8,7 +8,7 @@ import { Avatar, ListItemAvatar, List, CardContent } from '@mui/material'
 export default function comment({ comments }) {
   return (
     <>
-      {comments[0].user ? (
+      {comments[0]?.user ? (
         <List
           sx={{
             width: '100%',
@@ -47,7 +47,7 @@ export default function comment({ comments }) {
           })}
         </List>
       ) : (
-        'loading'
+        'no comments'
       )}
     </>
   )

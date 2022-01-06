@@ -1,12 +1,11 @@
 import PlayGround from '../components/index/playground'
 import Tab from '../components/commmon/Tab'
-import { BASE_URL, _fetch } from '../utils/consts.js'
+import { BASE_URL, _fetch } from '../utils/network.js'
 import Cookies from 'js-cookie'
-import { Drawer, Box } from '@mui/material'
+import { Drawer } from '@mui/material'
 import Search from '../components/index/search'
 import React, { useState, useEffect } from 'react'
 import SearchInfo from '../components/index/searchInfo'
-
 const SEARCH_STATE = {
   NOT_YET: 1,
   SEARCHED_WITH_ANSWER: 2,
@@ -26,19 +25,20 @@ export default function index() {
   // 搜索的
   const [searchState, setSearchState] = useState<number>(SEARCH_STATE.NOT_YET)
   useEffect(() => {
-    getMorePost()
+    getPost()
   }, [])
   const [posts, setPosts] = useState<Array<any>>([])
-  const [hasMore, setHasMore] = useState<boolean>(true)
   const [dateAndChannels, setDateAndChannels] = useState({})
+  const [isError, setIsError] = useState({})
 
-  const getMorePost = async () => {
-    const { events, hasMore } = await _fetch(BASE_URL + '/events', {
+  const getPost = async () => {
+    const { events, error } = await _fetch(BASE_URL + '/events', {
       offset: posts.length,
       limit: 10
     })
-    setHasMore(hasMore)
-    setPosts((post) => [...post, ...events])
+    setIsError(error)
+    if (error) return
+    setPosts(events)
   }
 
   const toggleDrawer =
@@ -56,8 +56,7 @@ export default function index() {
 
   async function SearchEvents(data) {
     setDateAndChannels(data)
-    const { events, hasMore } = await _fetch(BASE_URL + '/events', data)
-    console.log(events)
+    const { events } = await _fetch(BASE_URL + '/events', data)
     //返回的事件结果存储起来
     setPosts(events)
     //关闭drawer
@@ -70,59 +69,54 @@ export default function index() {
     const { events } = await _fetch(BASE_URL + '/events')
     setPosts(events)
   }
-  async function loadMore() {
-    const { events } = await _fetch(BASE_URL + '/events')
-    console.log(events)
-    //返回的事件结果存储起来
-    setPosts(events)
-    //关闭drawer
-    setState({ ...state, ['left']: false })
-    if (events.length > 0) setSearchState(SEARCH_STATE.SEARCHED_WITH_ANSWER)
-    else setSearchState(SEARCH_STATE.SEARCHED_WITHOUT_ANSWER)
-  }
-  return (
-    <>
-      {/* 菜单栏 */}
-      <Tab
-        userInfo={userInfo}
-        type="index"
-        toggleDrawer={toggleDrawer('left', true)}
-      />
-      {/* 根据搜索情况来展示 */}
-      {searchState == SEARCH_STATE.NOT_YET ? (
-        <></>
-      ) : searchState == SEARCH_STATE.SEARCHED_WITH_ANSWER ? (
-        <SearchInfo
-          CleanSearch={CleanSearch}
-          data={dateAndChannels}
-          length={posts.length}
+
+  if (isError?.status) {
+    return <a href="http://localhost:3000/login">Please Login</a>
+  } else
+    return (
+      <>
+        {/* 菜单栏 */}
+        <Tab
+          userInfo={userInfo}
+          type="index"
+          toggleDrawer={toggleDrawer('left', true)}
         />
-      ) : (
-        <div>
+        {/* 根据搜索情况来展示 */}
+        {searchState == SEARCH_STATE.NOT_YET ? (
+          <></>
+        ) : searchState == SEARCH_STATE.SEARCHED_WITH_ANSWER ? (
           <SearchInfo
             CleanSearch={CleanSearch}
             data={dateAndChannels}
             length={posts.length}
           />
-        </div>
-      )}
-      {/* 无限滚动内容 */}
-      <PlayGround userInfo={userInfo} data={posts} />
-      <div>
+        ) : (
+          <div>
+            <SearchInfo
+              CleanSearch={CleanSearch}
+              data={dateAndChannels}
+              length={posts.length}
+            />
+          </div>
+        )}
+        {/* 无限滚动内容 */}
+        <PlayGround data={posts} />
+
         {/* 抽屉 */}
-        {(['left'] as const).map((anchor) => (
-          <React.Fragment key={anchor}>
-            <Drawer
-              anchor={anchor}
-              open={state[anchor]}
-              onClose={toggleDrawer(anchor, false)}
-              sx={{ height: '100vh' }}
-            >
-              <Search Search={SearchEvents}></Search>
-            </Drawer>
-          </React.Fragment>
-        ))}
-      </div>
-    </>
-  )
+        <div>
+          {(['left'] as const).map((anchor) => (
+            <React.Fragment key={anchor}>
+              <Drawer
+                anchor={anchor}
+                open={state[anchor]}
+                onClose={toggleDrawer(anchor, false)}
+                sx={{ height: '100vh' }}
+              >
+                <Search Search={SearchEvents}></Search>
+              </Drawer>
+            </React.Fragment>
+          ))}
+        </div>
+      </>
+    )
 }

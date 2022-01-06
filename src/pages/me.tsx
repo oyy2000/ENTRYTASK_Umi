@@ -1,7 +1,5 @@
-import * as React from 'react'
-import Typography from '@mui/material/Typography'
 import { Card, CardContent, Button, Box, Avatar } from '@mui/material'
-import { EmailIcon } from '../components/SVGs/Icons.js'
+import { EmailIcon } from '../components/commmon/svgIcons.js'
 import Tab from '../components/commmon/Tab'
 import Cookies from 'js-cookie'
 

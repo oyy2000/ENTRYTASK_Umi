@@ -6,7 +6,6 @@ export default defineConfig({
     // { path: '/products', component: '@/pages/products' },
     { path: '/login', component: '@/pages/login' },
     { path: '/details', component: '@/pages/details' },
-    { path: '/search', component: '@/pages/search' },
     { path: '/me', component: '@/pages/me' }
   ],
   mfsu: {}

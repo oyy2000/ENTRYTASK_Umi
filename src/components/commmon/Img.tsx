@@ -11,14 +11,3 @@ export default function Img({ src, width, height }) {
     ></img>
   )
 }
-// export default function ImgWrapper({ Component }) {
-//   return (
-//     <div
-//       style={{
-//         borderRadius: "99%",
-//       }}
-//     >
-//       <Component />
-//     </div>
-//   )
-// }

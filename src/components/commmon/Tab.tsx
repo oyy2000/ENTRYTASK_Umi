@@ -7,8 +7,7 @@ import {
   Avatar
 } from '@mui/material'
 import { history } from 'umi'
-import { HomeIcon, LogoIcon, SearchIcon } from '../SVGs/Icons.js'
-
+import { HomeIcon, LogoIcon, SearchIcon } from './svgIcons.js'
 import { ThemeProvider } from '@mui/material/styles'
 import { theme } from '../../styles/palette.js'
 

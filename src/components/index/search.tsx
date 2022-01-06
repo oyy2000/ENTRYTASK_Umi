@@ -1,7 +1,7 @@
-import { BASE_URL, _fetch } from '../../utils/consts.js'
+import { BASE_URL, _fetch } from '../../utils/network.js'
 import Divider from '@mui/material/Divider'
 import { theme } from '../../styles/palette.js'
-import { HomeIcon, LogoIcon, SearchIcon } from '../SVGs/Icons.js'
+import { SearchIcon } from '../commmon/svgIcons.js'
 
 import dayjs from 'dayjs'
 import {

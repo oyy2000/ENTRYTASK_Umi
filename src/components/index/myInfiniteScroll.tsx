@@ -1,35 +1,31 @@
-import { useRef, useEffect, useCallback } from 'react'
-import useDebounced from '../../utils/useDebounce.js'
 import { useDebounceFn } from '@umijs/hooks'
+import { useRef, useEffect } from 'react'
+import useDebounced from '../../utils/useDebounce.js'
+// import { useDebounceFn } from '@umijs/hooks'
 export default function myInfiniteScroll({ loadMore, hasMore }) {
   let myRef = useRef<HTMLDivElement>()
   // 首次加载
   useEffect(() => {
-    setTimeout(() => {
-      var element = myRef.current
-      var current = window.innerHeight
-      var rect = element.getBoundingClientRect()
-      var elementTop = rect.top
-      if (current >= elementTop) {
-        console.log('loadmore')
-        loadMore()
-      }
-    }, 0)
+    console.log('first')
+    onScroll()
   }, [])
-  function onScroll() {
-    var element = myRef.current
-    var current = window.innerHeight
-    // console.log(myRef)
-    var rect = element.getBoundingClientRect()
-    var elementTop = rect.top
 
-    if (current >= elementTop) {
-      console.log('object')
+  function onScroll() {
+    // setTimeout(() => {
+    var element = myRef.current
+    console.log(myRef)
+    var current = window.innerHeight
+    var rect = element?.getBoundingClientRect()
+    var elementTop = rect?.top
+
+    if (current >= elementTop && hasMore) {
       loadMore()
     }
+    // }, 2000)
   }
-  const useDebouncedOnScroll = useDebounced(onScroll, 0)
-  const { run } = useDebounceFn(onScroll, 20)
+  const useDebouncedOnScroll = useDebounced(onScroll, 500)
+  // 尝试使用umi / hooks中的useDebounceFn
+  // const { run } = useDebounceFn(onScroll, 100)
   useEffect(function () {
     window.addEventListener('scroll', useDebouncedOnScroll)
     return function () {

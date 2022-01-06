@@ -7,6 +7,7 @@ import dayjs from 'dayjs'
 export default function Info({ data }) {
   return (
     <div
+      id={data.id}
       // align="center"
       // wrap
       style={{

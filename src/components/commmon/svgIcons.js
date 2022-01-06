@@ -16,6 +16,7 @@ export function HomeIcon(props) {
     </SvgIcon>
   )
 }
+
 export function SearchIcon(props) {
   return (
     <SvgIcon {...props}>

@@ -17,8 +17,6 @@ export const getCookie = (key, req) => {
 // 从客户端获取cookie
 const getCookieFromBrowser = (key) => {
   return cookie.get(key)
-  // 从客户端获取cookie
-  // 从客户端获取cookie
 }
 // 从server端获取cookie
 const getCookieFromServer = (key, req) => {
@@ -56,44 +54,11 @@ export async function _fetch(url, data, method = 'GET', options = {}) {
     params.headers = new Headers({
       Accept: 'application/json',
       'Content-Type': 'application/x-www-form-urlencoded',
-      // 'X-BLACKCAT-TOKEN': TEMPO_TOKEN,
       'X-BLACKCAT-TOKEN': getCookie('USER_TOKEN')
     })
   }
   //发请求， 并且直接返回promise包裹的结果 可以做错误操作
   let res = await fetch(url, params)
+  if (res.status != 200) return { error: { msg: 'Auth Failed', status: true } }
   return (await options.dataType) == 'text' ? res.text() : res.json()
-}
-
-export function postLogout() {
-  console.log('logout')
-  let url = 'http://0.0.0.0:3090/api/v1/auth/token'
-  fetch(url, {
-    method: 'DELETE',
-    mode: 'cors',
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      console.log('Success:', data)
-    })
-    .catch((error) => {
-      console.error('Error:', error)
-    })
-}
-
-export async function getEvents(options) {
-  console.log('events')
-  let url = 'http://0.0.0.0:3090/api/v1/events'
-  await _fetch(url, options, 'GET', {
-    mode: 'cors',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-BLACKCAT-TOKEN': TEMPO_TOKEN
-      // "X-BLACKCAT-TOKEN": getCookie("USER_TOKEN", req),
-      // "X-BLACKCAT-TOKEN": ISSERVER ? "" : localStorage.getItem("Token"),
-    }
-  })
 }

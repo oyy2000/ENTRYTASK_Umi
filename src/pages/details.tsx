@@ -1,13 +1,12 @@
 import { useEffect, useState } from 'react'
-import styles from './index.less'
-import { BASE_URL, _fetch } from '../utils/consts.js'
+import { BASE_URL, _fetch } from '../utils/network.js'
 import { history } from 'umi'
 import MyTab from '@/components/commmon/Tab'
 import Comments from '@/components/details/comments'
 
 import Cookies from 'js-cookie'
 
-import { Avatar, Box, CardContent, List, Divider } from '@mui/material'
+import { Avatar, Box, CardContent, Divider } from '@mui/material'
 import { Tag } from 'antd-mobile'
 
 export default function Details() {

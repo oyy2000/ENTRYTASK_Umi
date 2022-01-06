@@ -1,11 +1,9 @@
-import * as React from 'react'
 import Typography from '@mui/material/Typography'
 import { Card, CardContent, Button, Box } from '@mui/material'
-import { CardMedia } from '@mui/material'
 import { ThemeProvider } from '@mui/material/styles'
 import { theme } from '../../styles/palette.js'
 import dayjs from 'dayjs'
-import { BallIcon } from '../SVGs/Icons.js'
+import { BallIcon } from '../commmon/svgIcons.js'
 export default function SearchInfo({ CleanSearch, length, data }) {
   return (
     <>
@@ -60,8 +58,9 @@ export default function SearchInfo({ CleanSearch, length, data }) {
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-            height: '50vh',
-            flexDirection: 'column'
+            height: '90vh',
+            flexDirection: 'column',
+            padding: '-100px'
           }}
         >
           <BallIcon sx={{ color: '#D3C1E5', fontSize: '100px' }} />
